@@ -23,10 +23,25 @@ export const users = [
 
 export async function GET(request) {
   try {
+    const searchParams = request.nextUrl.searchParams;
+
+    const name = searchParams.get("name");
+    const age = searchParams.get("age");
+
+    let filteredUser = users;
+    if (age) {
+      filteredUser = filteredUser.filter((user) => user.age === Number(age));
+    }
+
+    if (name) {
+      filteredUser = filteredUser.filter((user) =>
+        user.name.toLowerCase().includes(name.toLowerCase())
+      );
+    }
     return NextResponse.json({
       success: true,
-      data: users,
-      total: users.length,
+      data: filteredUser,
+      total: filteredUser.length,
     });
   } catch (error) {
     return NextResponse.json(

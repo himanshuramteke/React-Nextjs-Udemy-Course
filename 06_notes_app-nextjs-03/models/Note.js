@@ -21,9 +21,8 @@ const NoteSchema = new mongoose.Schema({
   },
 });
 
-NoteSchema.pre("save", function (next) {
-  this.updatedAt = Date.now;
-  next();
+NoteSchema.pre("save", async function () {
+  this.updatedAt = Date.now();
 });
 
-export default mongoose.model.Note || mongoose.model("Note", NoteSchema);
+export default mongoose.models.Note || mongoose.model("Note", NoteSchema);

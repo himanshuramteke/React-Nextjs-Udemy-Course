@@ -12,6 +12,22 @@ function NotesClient({ initialNotes }) {
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const [editingId, setEditingId] = useState();
+  const [editTitle, setEditTitle] = useState();
+  const [editContent, setEditContent] = useState();
+
+  const startEditing = (note) => {
+    setEditingId(note._id);
+    setEditTitle(note.title);
+    setEditContent(note.content);
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditTitle("");
+    setEditContent("");
+  };
+
   const createNote = async (e) => {
     e.preventDefault();
     if (!title.trim() || !content.trim()) return;
@@ -54,6 +70,35 @@ function NotesClient({ initialNotes }) {
     }
   };
 
+  const updateNote = async (id) => {
+    if (!editTitle.trim() || !editContent.trim()) return;
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`/api/notes/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: editTitle, content: editContent }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success("Notes updated successfully");
+        setNotes(notes.map((note) => (note._id === id ? result.data : note)));
+
+        setEditingId(null);
+        setEditTitle("");
+        setEditContent("");
+      }
+
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error updating note:", error);
+      toast.error("Something went wrong");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <form onSubmit={createNote} className="bg-white p-6 rounded-lg shadow-md">
@@ -74,6 +119,7 @@ function NotesClient({ initialNotes }) {
               onChange={(e) => setContent(e.target.value)}
               rows={4}
               className="w-full p-3 border border-gray-300 text-gray-800 rounded-md focus:outline-none focus:ring-blue-500"
+              required
             />
             <button
               type="Submit"
@@ -93,22 +139,67 @@ function NotesClient({ initialNotes }) {
         ) : (
           notes.map((note) => (
             <div key={note._id} className="bg-white p-6 rounded-lg shadow-md">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-lg text-gray-800 font-semibold">
-                  {note.title}
-                </h3>
-                <div className="flex gap-2">
-                  <button className="text-blue-500 hover:text-blue-500 text-sm hover:cursor-pointer">
-                    Edit <FaEdit />
-                  </button>
-                  <button
-                    onClick={() => deleteNote(note._id)}
-                    className="text-red-500 hover:text-red-500 text-sm hover:cursor-pointer"
-                  >
-                    Delete <RiDeleteBin6Fill />
-                  </button>
-                </div>
-              </div>
+              {editingId === note._id ? (
+                <>
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="w-full p-3 mt-2 border border-gray-300 text-gray-800 rounded-md focus:outline-none focus:ring-blue-500"
+                      required
+                    />
+                    <textarea
+                      placeholder="Note Content"
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      rows={4}
+                      className="w-full p-3 border border-gray-300 text-gray-800 rounded-md focus:outline-none focus:ring-blue-500"
+                      required
+                    />
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => updateNote(note._id)}
+                        disabled={isLoading}
+                        className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 disabled:opacity-50"
+                      >
+                        {isLoading ? "Saving..." : "Save"}
+                      </button>
+
+                      <button
+                        onClick={cancelEditing}
+                        className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                // Editing mode
+                <>
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg text-gray-800 font-semibold">
+                      {note.title}
+                    </h3>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => startEditing(note)}
+                        className="text-blue-500 hover:text-blue-500 text-sm hover:cursor-pointer"
+                      >
+                        Edit <FaEdit />
+                      </button>
+                      <button
+                        onClick={() => deleteNote(note._id)}
+                        className="text-red-500 hover:text-red-500 text-sm hover:cursor-pointer"
+                      >
+                        Delete <RiDeleteBin6Fill />
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
 
               <p className="text-gray-700 mb-2">{note.content}</p>
               <p className="text-sm text-gray-500">

@@ -70,6 +70,7 @@ function TodoForm() {
               id="title"
               {...form.register("title")}
               placeholder="Enter todo title..."
+              className="mt-2"
             />
             {form.formState.errors.title && (
               <p className="text-sm text-destructive mt-1">
@@ -85,6 +86,7 @@ function TodoForm() {
               {...form.register("description")}
               placeholder="Enter description (optional)..."
               rows={3}
+              className="mt-2"
             />
             {form.formState.errors.description && (
               <p className="text-sm text-destructive mt-1">

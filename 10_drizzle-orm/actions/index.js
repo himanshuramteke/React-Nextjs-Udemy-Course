@@ -23,9 +23,9 @@ export async function createUser(formData) {
 }
 
 export async function getAllUsers() {
-  const user = await db.select().from(users);
+  const allUser = await db.select().from(users);
 
-  return user || [];
+  return allUser || [];
 }
 
 export async function getUserById(id) {

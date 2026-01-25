@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { Spinner } from "@/components/ui/spinner";
 
 function LoginPage() {
   const [email, setEmail] = useState("");
@@ -59,7 +60,7 @@ function LoginPage() {
             disabled={loading}
             className="w-full bg-emerald-600 hover:bg-emerald-700 hover:cursor-pointer"
           >
-            {loading ? "logged in..." : "Login"}
+            {loading ? <Spinner /> : "Login"}
           </Button>
         </form>
 

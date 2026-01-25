@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/ui/spinner";
 
 function SignupPage() {
   const [email, setEmail] = useState("");
@@ -88,7 +89,7 @@ function SignupPage() {
             disabled={loading}
             className="w-full bg-emerald-600 hover:bg-emerald-700 hover:cursor-pointer"
           >
-            {loading ? "Signing up..." : "Sign up"}
+            {loading ? <Spinner /> : "Sign up"}
           </Button>
         </form>
 

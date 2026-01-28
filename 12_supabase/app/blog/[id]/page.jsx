@@ -1,11 +1,14 @@
 import BlogContentPage from "@/components/blog-content";
+import DeletePostButton from "@/components/delete-post";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { createServer } from "@/lib/supabase/server";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { DeletePost } from "./actions";
 
 async function BlogPostPage({ params }) {
+  const { id } = await params;
   const supabase = await createServer();
 
   const {
@@ -19,7 +22,7 @@ async function BlogPostPage({ params }) {
   const { data: post } = await supabase
     .from("posts")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("user_id", user.id)
     .single();
 
@@ -30,7 +33,7 @@ async function BlogPostPage({ params }) {
   return (
     <main className="min-h-screen bg-zinc-950">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex ml-auto gap-3 mb-3">
           <Link href="/">
             <Button variant="outline">Back</Button>
           </Link>
@@ -39,6 +42,8 @@ async function BlogPostPage({ params }) {
               Edit
             </Button>
           </Link>
+
+          <DeletePostButton postId={post.id} action={DeletePost} />
         </div>
 
         <Card className="p-8 bg-zinc-900 border-zinc-800">
@@ -55,7 +60,7 @@ async function BlogPostPage({ params }) {
           </p>
 
           <div className="prose prose-invert max-w-none text-zinc-300">
-            <BlogContentPage content={post.content} />
+            <BlogContentPage content={post.content.content} />
           </div>
         </Card>
       </div>
